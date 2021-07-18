@@ -5,5 +5,6 @@ package main
 import "go_practice/go_practice"
 
 func main() {
-	go_practice.AtomicPractice()
+	//go_practice.AtomicPractice()
+	go_practice.RunStructDemo()
 }
