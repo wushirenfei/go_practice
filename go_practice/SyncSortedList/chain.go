@@ -33,17 +33,24 @@ func NewNode(value int) *intNode {
 	return &intNode{value: value}
 }
 
-func (l *IntList) Contains(value int) bool {
-	a := l.head.getNextNode()
-	for a != nil {
-		if a.getValue() == value {
-			// need atomic get marked
-			return a.getMark() == unMarked
-		} else {
-			a = a.getNextNode()
-		}
-	}
-	return false
+func (n *intNode) getNextNode() *intNode {
+	return (*intNode)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&n.next))))
+}
+
+func (n *intNode) getValue() int {
+	return int(atomic.LoadInt64((*int64)(unsafe.Pointer(&n.value))))
+}
+
+func (n *intNode) setValue(value int) {
+	atomic.StoreInt64((*int64)(unsafe.Pointer(&n.value)), int64(value))
+}
+
+func (n *intNode) setNext(next *intNode) {
+	atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&n.next)), unsafe.Pointer(next))
+}
+
+func (n *intNode) getMark() int32 {
+	return atomic.LoadInt32(&n.marked)
 }
 
 func (l *IntList) Insert(value int) bool {
@@ -100,7 +107,7 @@ func (l *IntList) Delete(value int) bool {
 
 		a.nLocker.Lock()
 		// 2. why need a.next == b?
-		if a.next !=b || a.marked == isMarked {
+		if a.next != b || a.marked == isMarked {
 			b.nLocker.Unlock()
 			a.nLocker.Unlock()
 			continue
@@ -131,22 +138,15 @@ func (l *IntList) Range(f func(value int) bool) {
 	}
 }
 
-func (n *intNode) getNextNode() *intNode {
-	return (*intNode)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&n.next))))
-}
-
-func (n *intNode) getValue() int {
-	return int(atomic.LoadInt64((*int64)(unsafe.Pointer(&n.value))))
-}
-
-func (n *intNode) setValue(value int) {
-	atomic.StoreInt64((*int64)(unsafe.Pointer(&n.value)), int64(value))
-}
-
-func (n *intNode) setNext(next *intNode) {
-	atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&n.next)), unsafe.Pointer(next))
-}
-
-func (n *intNode) getMark() int32 {
-	return atomic.LoadInt32(&n.marked)
+func (l *IntList) Contains(value int) bool {
+	a := l.head.getNextNode()
+	for a != nil {
+		if a.getValue() == value {
+			// need atomic get marked
+			return a.getMark() == unMarked
+		} else {
+			a = a.getNextNode()
+		}
+	}
+	return false
 }

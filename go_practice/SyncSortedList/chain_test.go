@@ -247,3 +247,19 @@ func TestIntSet(t *testing.T) {
 		panic("invalid count")
 	}
 }
+
+func TestDiffReceiver(t *testing.T) {
+	l := NewInt()
+	if l.Len() != 0 {
+		t.Fatal("invalid length")
+	}
+
+	if !l.Insert(0) || !l.Insert(3) || !l.Insert(1) {
+		t.Fatal("invalid insert")
+	}
+
+	if l.Len() != 3 {
+		fmt.Println(l.Len())
+		t.Fatal("wrong len")
+	}
+}
