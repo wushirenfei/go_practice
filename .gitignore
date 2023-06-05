@@ -1,3 +1,4 @@
+vendor/
 *.o
 *.a
 *.so
@@ -27,10 +28,14 @@ _testmain.go
 *settings.pyc
 *.sublime-project
 *.sublime-workspace
-!.gitkeep
 .DS_Store
 /.idea
+/go_practice/.idea/
 /.vscode
 /output
-/venv
 *.local.yml
+node_modules
+package-lock.json
+.env
+.tmp
+/log
