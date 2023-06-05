@@ -1,5 +1,3 @@
-// Copyright © Bytedance All Rights Reserved.
-// :author Alex Ma
 // :date 2022/10/28
 
 package test
